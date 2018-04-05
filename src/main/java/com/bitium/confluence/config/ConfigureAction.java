@@ -41,6 +41,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	private String idpRequired;
 	private String redirectUrl;
 	private String maxAuthenticationAge;
+	private String serviceProviderEntityId;
 	private ArrayList<String> existingGroups;
 
 	private SAMLConfluenceConfig saml2Config;
@@ -107,33 +108,47 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		this.existingGroups = existingGroups;
 	}
 
+	public void setServiceProviderEntityId(final String serviceProviderEntityId) {
+		this.serviceProviderEntityId = serviceProviderEntityId;
+	}
+
+	public String getServiceProviderEntityId() {
+		return serviceProviderEntityId;
+	}
+
 	/**
 	 * @return Metadata federation file or null if none was passed to a form.
      */
-    public File getFederationMetadata() {
+    public File getMetadataFile() {
         final MultiPartRequestWrapper wrapper = (MultiPartRequestWrapper) ServletActionContext.getRequest();
 		final File[] files = wrapper.getFiles("metadata");
-        return files.length > 0
+        return files != null && files.length > 0
                 ? files[0]
                 : null;
     }
 
-	protected List getPermissionTypes() {
-		List requiredPermissions = super.getPermissionTypes();
+	protected List<String> getPermissionTypes() {
+		List<String> requiredPermissions = super.getPermissionTypes();
 		requiredPermissions.add("ADMINISTRATECONFLUENCE");
 		return requiredPermissions;
 	}
 
 	@Override
 	public void validate() {
-		if (getFederationMetadata() == null) {
-			addActionError(getText("saml2Plugin.admin.metadataFileIsMissing"));
+		if (StringUtils.isBlank(getServiceProviderEntityId())) {
+			addActionError(getText("saml2plugin.admin.spEntityIdIsMissing"));
 		}
+
+		if (getMetadataFile() == null) {
+			addActionError(getText("saml2plugin.admin.metadataFileIsMissing"));
+		}
+
 		if (StringUtils.isBlank(getIdpRequired())) {
 			setIdpRequired("false");
 		} else {
 			setIdpRequired("true");
 		}
+
 		if (StringUtils.isBlank(getAutoCreateUser())) {
 			setAutoCreateUser("false");
 		} else {
@@ -141,7 +156,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		}
 		
 		if(StringUtils.isBlank(getMaxAuthenticationAge()) || (!StringUtils.isNumeric(getMaxAuthenticationAge()))){
-			addActionError(getText("saml2Plugin.admin.maxAuthenticationAgeInvalid"));
+			addActionError(getText("saml2plugin.admin.maxAuthenticationAgeInvalid"));
 		}
 
 		super.validate();
@@ -149,6 +164,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 
 	public String doDefault() throws Exception {
 		setRedirectUrl(saml2Config.getRedirectUrl());
+		setServiceProviderEntityId(saml2Config.getSpEntityId());
 		long maxAuthenticationAge = saml2Config.getMaxAuthenticationAge();
 		
 		//Default Value
@@ -186,12 +202,13 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	}
 
 	public String execute() throws Exception {
-		saml2Config.setFederationMetadata(getFederationMetadata());
 		saml2Config.setIdpRequired(getIdpRequired());
 		saml2Config.setRedirectUrl(getRedirectUrl());
 		saml2Config.setAutoCreateUser(getAutoCreateUser());
 		saml2Config.setAutoCreateUserDefaultGroup(getDefaultAutoCreateUserGroup());
 		saml2Config.setMaxAuthenticationAge(Long.parseLong(getMaxAuthenticationAge()));
+		saml2Config.setSpEntityId(getServiceProviderEntityId());
+		saml2Config.setMetadataFile(getMetadataFile());
 
 		addActionMessage(getText("saml2plugin.admin.message.saved"));
 		return "success";

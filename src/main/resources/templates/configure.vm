@@ -36,14 +36,26 @@
         <span id="endpoint-copied" class="config_form_copied">$i18n.getText("saml2plugin.admin.endpoint-copied")</span>
     </div>
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.samlEndpoint.desc")</div>
+
+    <div class="field-label">$i18n.getText("saml2plugin.admin.field.spEntityId")</div>
+    <input class="field-input" type="text" name="spEntityId" id="spEntityId"
+           value="$serviceProviderEntityId"/>
+    <div class="field-desc">$i18n.getText("saml2plugin.admin.field.spEntityId.desc")</div>
+
+    <div class="field-label">$i18n.getText("saml2plugin.admin.field.metadata")</div>
+    <input class="ignore-inline-attach" type="file" name="metadata" id="metadata"/>
+    <div class="field-desc">$i18n.getText("saml2plugin.admin.field.metadata.desc")</div>
+
     <div class="field-label">$i18n.getText("saml2plugin.admin.field.redirectUrl")</div>
     <input class="field-input" type="text" name="redirectUrl" id="redirectUrl"
            value="$generalUtil.htmlEncode( $redirectUrl )"/>
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.redirectUrl.desc")</div>
+
     <div class="field-label">$i18n.getText("saml2plugin.admin.field.maxAuthenticationAge")</div>
     <input class="field-input" type="text" name="maxAuthenticationAge" id="maxAuthenticationAge"
            value="$maxAuthenticationAge"/>
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.maxAuthenticationAge.desc")</div>
+
     <div class="field-label field-label-checkbox">
         <input type="checkbox" name="idpRequired" id="idpRequired" class="checkbox"
             #if ($idpRequired.equals("true"))
@@ -51,13 +63,13 @@
             #end>$i18n.getText("saml2plugin.admin.field.idpRequired")
     </div>
     <div class="field-desc field-desc-checkbox">$i18n.getText("saml2plugin.admin.field.idpRequired.desc")</div>
+
     <div class="field-label field-label-checkbox">
         <input type="checkbox" name="autoCreateUser" id="autoCreateUser" class="checkbox"
             #if ($autoCreateUser.equals("true"))
                checked
             #end>$i18n.getText("saml2plugin.admin.field.autoCreateUser")
     </div>
-
     <div class="field-desc field-desc-checkbox">$i18n.getText("saml2plugin.admin.field.autoCreateUser.desc")</div>
 
     <div class="field-label">$i18n.getText("saml2plugin.admin.field.autoCreateUserDefaultGroup")</div>
@@ -70,10 +82,6 @@
         #end
     </select>
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.autoCreateUserDefaultGroup.desc")</div>
-
-    <div class="field-label">$i18n.getText("saml2plugin.admin.field.metadata")</div>
-    <input class="field-input ignore-inline-attach" type="file" name="metadata" id="metadata"/>
-    <div class="field-desc">$i18n.getText("saml2plugin.admin.field.metadata.desc")</div>
 
     <div class="config_form_actions">
         <input class="aui-button aui-button-primary" type="submit"
