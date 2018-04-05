@@ -19,7 +19,8 @@
     </div>
     #end
 <form class="aui config_form" name="saml2plugin-configure-form" method="POST"
-      action="${req.contextPath}/admin/plugins/saml2plugin/doconfigure.action">
+      action="${req.contextPath}/admin/plugins/saml2plugin/doconfigure.action"
+      enctype="multipart/form-data">
     #form_xsrfToken()
 
     #set($urlPrefix = "http://")
@@ -35,20 +36,6 @@
         <span id="endpoint-copied" class="config_form_copied">$i18n.getText("saml2plugin.admin.endpoint-copied")</span>
     </div>
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.samlEndpoint.desc")</div>
-    <div class="field-label">$i18n.getText("saml2plugin.admin.field.loginUrl")</div>
-    <input class="field-input" type="text" name="loginUrl" id="loginUrl" value="$generalUtil.htmlEncode( $loginUrl )"/>
-    <div class="field-desc">$i18n.getText("saml2plugin.admin.field.loginUrl.desc")</div>
-    <div class="field-label">$i18n.getText("saml2plugin.admin.field.logoutUrl")</div>
-    <input class="field-input" type="text" name="logoutUrl" id="logoutUrl"
-           value="$generalUtil.htmlEncode( $logoutUrl )"/>
-    <div class="field-desc">$i18n.getText("saml2plugin.admin.field.logoutUrl.desc")</div>
-    <div class="field-label">$i18n.getText("saml2plugin.admin.field.x509Certificate")</div>
-    <textarea class="field-input" name="x509Certificate" id="x509Certificate"
-              rows="10">$generalUtil.htmlEncode( $x509Certificate )</textarea>
-    <div class="field-desc">$i18n.getText("saml2plugin.admin.field.x509Certificate.desc")</div>
-    <div class="field-label">$i18n.getText("saml2plugin.admin.field.entityId")</div>
-    <input class="field-input" type="text" name="entityId" id="entityId" value="$generalUtil.htmlEncode( $entityId )"/>
-    <div class="field-desc">$i18n.getText("saml2plugin.admin.field.entityId.desc")</div>
     <div class="field-label">$i18n.getText("saml2plugin.admin.field.redirectUrl")</div>
     <input class="field-input" type="text" name="redirectUrl" id="redirectUrl"
            value="$generalUtil.htmlEncode( $redirectUrl )"/>
@@ -83,6 +70,10 @@
         #end
     </select>
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.autoCreateUserDefaultGroup.desc")</div>
+
+    <div class="field-label">$i18n.getText("saml2plugin.admin.field.metadata")</div>
+    <input class="field-input ignore-inline-attach" type="file" name="metadata" id="metadata"/>
+    <div class="field-desc">$i18n.getText("saml2plugin.admin.field.metadata.desc")</div>
 
     <div class="config_form_actions">
         <input class="aui-button aui-button-primary" type="submit"

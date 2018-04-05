@@ -10,10 +10,9 @@
     <packaging>atlassian-plugin</packaging>
     <dependencies>
         <dependency>
-            <groupId>com.bitium.saml</groupId>
-            <artifactId>SAML2Commons</artifactId>
-            <version>1.1.1</version>
-            <scope>compile</scope>
+            <groupId>com.github.kamyshova</groupId>
+            <artifactId>atlassian-saml</artifactId>
+            <version>develop-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -93,6 +92,10 @@
                 <checksumPolicy>warn</checksumPolicy>
             </releases>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
     <build>
         <plugins>
@@ -115,6 +118,21 @@
             </plugin>
         </plugins>
     </build>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>atlassian-public</id>
+            <url>https://maven.atlassian.com/content/repositories/atlassian-public/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
     <properties>
         <confluence.version>5.6.1</confluence.version>
         <confluence.data.version>5.6.1</confluence.data.version>

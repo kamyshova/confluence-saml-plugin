@@ -80,14 +80,14 @@ along with Pineapple. If not, see <http://www.gnu.org/licenses/>.
             <action name="configure" class="com.bitium.confluence.config.ConfigureAction" method="doDefault">
                 <interceptor-ref name="defaultStack"/>
                 <result name="input" type="velocity">/templates/configure.vm</result>
-		<result name="error" type="velocity">/templates/configure.vm</result>
+		        <result name="error" type="velocity">/templates/configure.vm</result>
             </action>
             <action name="doconfigure" class="com.bitium.confluence.config.ConfigureAction" method="execute">
                 <param name="RequireSecurityToken">true</param>
                 <interceptor-ref name="validatingStack"/>
-		<result name="input" type="velocity">/templates/configure.vm</result>
+		        <result name="input" type="velocity">/templates/configure.vm</result>
                 <result name="success" type="velocity">/templates/configure.vm</result>
-		<result name="error" type="velocity">/templates/configure.vm</result>
+		        <result name="error" type="velocity">/templates/configure.vm</result>
             </action>
         </package>
     </xwork>
