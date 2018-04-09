@@ -41,7 +41,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	private String idpRequired;
 	private String redirectUrl;
 	private String maxAuthenticationAge;
-	private String serviceProviderEntityId;
+	private String spEntityId;
 	private ArrayList<String> existingGroups;
 
 	private SAMLConfluenceConfig saml2Config;
@@ -108,12 +108,12 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		this.existingGroups = existingGroups;
 	}
 
-	public void setServiceProviderEntityId(final String serviceProviderEntityId) {
-		this.serviceProviderEntityId = serviceProviderEntityId;
+	public void setSpEntityId(final String spEntityId) {
+		this.spEntityId = spEntityId;
 	}
 
-	public String getServiceProviderEntityId() {
-		return serviceProviderEntityId;
+	public String getSpEntityId() {
+		return spEntityId;
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 
 	@Override
 	public void validate() {
-		if (StringUtils.isBlank(getServiceProviderEntityId())) {
+		if (StringUtils.isBlank(getSpEntityId())) {
 			addActionError(getText("saml2plugin.admin.spEntityIdIsMissing"));
 		}
 
@@ -164,7 +164,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 
 	public String doDefault() throws Exception {
 		setRedirectUrl(saml2Config.getRedirectUrl());
-		setServiceProviderEntityId(saml2Config.getSpEntityId());
+		setSpEntityId(saml2Config.getSpEntityId());
 		long maxAuthenticationAge = saml2Config.getMaxAuthenticationAge();
 		
 		//Default Value
@@ -207,7 +207,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		saml2Config.setAutoCreateUser(getAutoCreateUser());
 		saml2Config.setAutoCreateUserDefaultGroup(getDefaultAutoCreateUserGroup());
 		saml2Config.setMaxAuthenticationAge(Long.parseLong(getMaxAuthenticationAge()));
-		saml2Config.setSpEntityId(getServiceProviderEntityId());
+		saml2Config.setSpEntityId(getSpEntityId());
 		saml2Config.setMetadataFile(getMetadataFile());
 
 		addActionMessage(getText("saml2plugin.admin.message.saved"));
