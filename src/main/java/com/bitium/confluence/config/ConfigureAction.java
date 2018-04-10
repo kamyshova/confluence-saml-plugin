@@ -26,11 +26,8 @@ import com.atlassian.confluence.core.ConfluenceActionSupport;
 import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.spring.container.ContainerManager;
 import com.atlassian.user.Group;
-import com.opensymphony.webwork.ServletActionContext;
-import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +43,8 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	private String keystorePassword;
 	private String signKey;
 	private String requestBinding;
-	private File metadata;
+	private String metadata;
+	private String keystore;
 	private ArrayList<String> existingGroups;
 
 	private SAMLConfluenceConfig saml2Config;
@@ -145,23 +143,20 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		this.requestBinding = requestBinding;
 	}
 
-	/**
-	 * @return Metadata federation file or null if none was passed to a form.
-     */
-    public File getMetadataFile() {
-        final MultiPartRequestWrapper wrapper = (MultiPartRequestWrapper) ServletActionContext.getRequest();
-		final File[] files = wrapper.getFiles("metadata");
-        return files != null && files.length > 0
-                ? files[0]
-                : null;
-    }
+	public String getMetadata() {
+		return metadata;
+	}
 
-	public File getKeystoreFile() {
-		final MultiPartRequestWrapper wrapper = (MultiPartRequestWrapper) ServletActionContext.getRequest();
-		final File[] files = wrapper.getFiles("keystore");
-		return files != null && files.length > 0
-				? files[0]
-				: null;
+	public void setMetadata(String metadata) {
+		this.metadata = metadata;
+	}
+
+	public String getKeystore() {
+		return keystore;
+	}
+
+	public void setKeystore(String keystore) {
+		this.keystore = keystore;
 	}
 
 	protected List<String> getPermissionTypes() {
@@ -176,7 +171,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 			addActionError(getText("saml2plugin.admin.spEntityIdIsMissing"));
 		}
 
-		if (getMetadataFile() == null) {
+		if (getMetadata() == null) {
 			addActionError(getText("saml2plugin.admin.metadataFileIsMissing"));
 		}
 
@@ -196,7 +191,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 			addActionError(getText("saml2plugin.admin.maxAuthenticationAgeInvalid"));
 		}
 
-		if (getKeystoreFile() == null) {
+		if (getKeystore() == null) {
 			addActionError(getText("saml2plugin.admin.keystoreFileIsMissing"));
 		}
 
@@ -219,11 +214,12 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		setRedirectUrl(saml2Config.getRedirectUrl());
 		setSpEntityId(saml2Config.getSpEntityId());
 		long maxAuthenticationAge = saml2Config.getMaxAuthenticationAge();
-
-
+		setMetadata(saml2Config.getMetadata());
+		setKeystore(saml2Config.getKeystore());
 		setKeystorePassword(saml2Config.getKeyStorePasswordSetting());
 		setSignKey(saml2Config.getSignKeySetting());
 		setRequestBinding(saml2Config.getRequestBindingSetting());
+
 		//Default Value
 		if(maxAuthenticationAge==Long.MIN_VALUE){
 			setMaxAuthenticationAge("7200");
@@ -265,8 +261,8 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		saml2Config.setAutoCreateUserDefaultGroup(getDefaultAutoCreateUserGroup());
 		saml2Config.setMaxAuthenticationAge(Long.parseLong(getMaxAuthenticationAge()));
 		saml2Config.setSpEntityId(getSpEntityId());
-		saml2Config.setMetadataFile(getMetadataFile());
-		saml2Config.setKeystoreFile(getKeystoreFile());
+		saml2Config.setMetadataFile(getMetadata());
+		saml2Config.setKeystoreFile(getKeystore());
 		saml2Config.setKeyStorePasswordSetting(getKeystorePassword());
 		saml2Config.setSignKeySetting(getSignKey());
 		saml2Config.setRequestBindingSetting(getRequestBinding());

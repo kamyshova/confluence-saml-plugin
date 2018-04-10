@@ -43,11 +43,13 @@
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.spEntityId.desc")</div>
 
     <div class="field-label">$i18n.getText("saml2plugin.admin.field.metadata")</div>
-    <input class="ignore-inline-attach" type="file" name="metadata" id="metadata"/>
+    <input class="field-input" type="text" name="metadata" id="metadata"
+               value="$metadata"/>
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.metadata.desc")</div>
 
     <div class="field-label">$i18n.getText("saml2plugin.admin.field.keystore")</div>
-    <input class="ignore-inline-attach" type="file" name="keystore" id="keystore"/>
+    <input class="field-input" type="text" name="keystore" id="keystore"
+               value="$keystore"/>
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.keystore.desc")</div>
 
     <div class="field-label">$i18n.getText("saml2plugin.admin.field.keystorePassword")</div>
