@@ -22,33 +22,32 @@
 
 package com.bitium.confluence.config;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.atlassian.confluence.core.ConfluenceActionSupport;
 import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.spring.container.ContainerManager;
 import com.atlassian.user.Group;
+import com.opensymphony.webwork.ServletActionContext;
+import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.commons.lang.StringUtils;
 
-import com.atlassian.confluence.core.ConfluenceActionSupport;
-import com.bitium.saml.X509Utils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigureAction extends ConfluenceActionSupport {
 	private static final long serialVersionUID = 1L;
 
-	private String loginUrl;
-	private String logoutUrl;
-	private String entityId;
 	private String autoCreateUser;
 	private String defaultAutoCreateUserGroup;
-	private String x509Certificate;
 	private String idpRequired;
 	private String redirectUrl;
 	private String maxAuthenticationAge;
+	private String spEntityId;
+	private String keystorePassword;
+	private String signKey;
+	private String requestBinding;
+	private File metadata;
 	private ArrayList<String> existingGroups;
-
 
 	private SAMLConfluenceConfig saml2Config;
 
@@ -67,44 +66,12 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		this.idpRequired = idpRequired;
 	}
 
-	public String getX509Certificate() {
-		return x509Certificate;
-	}
-
-	public void setX509Certificate(String x509Certificate) {
-		this.x509Certificate = x509Certificate;
-	}
-
-	public String getEntityId() {
-		return entityId;
-	}
-
-	public void setEntityId(String entityId) {
-		this.entityId = entityId;
-	}
-
 	public String getAutoCreateUser() {
 		return autoCreateUser;
 	}
 
 	public void setAutoCreateUser(String autoCreateUser) {
 		this.autoCreateUser = autoCreateUser;
-	}
-
-	public String getLogoutUrl() {
-		return logoutUrl;
-	}
-
-	public void setLogoutUrl(String logoutUrl) {
-		this.logoutUrl = logoutUrl;
-	}
-
-	public String getLoginUrl() {
-		return loginUrl;
-	}
-
-	public void setLoginUrl(String loginUrl) {
-		this.loginUrl = loginUrl;
 	}
 
 	public String getRedirectUrl() {
@@ -146,49 +113,79 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		this.existingGroups = existingGroups;
 	}
 
-	protected List getPermissionTypes() {
-		List requiredPermissions = super.getPermissionTypes();
+	public void setSpEntityId(final String spEntityId) {
+		this.spEntityId = spEntityId;
+	}
+
+	public String getSpEntityId() {
+		return spEntityId;
+	}
+
+	public String getKeystorePassword() {
+		return keystorePassword;
+	}
+
+	public void setKeystorePassword(String keystorePassword) {
+		this.keystorePassword = keystorePassword;
+	}
+
+	public String getSignKey() {
+		return signKey;
+	}
+
+	public void setSignKey(String signKey) {
+		this.signKey = signKey;
+	}
+
+	public String getRequestBinding() {
+		return requestBinding;
+	}
+
+	public void setRequestBinding(String requestBinding) {
+		this.requestBinding = requestBinding;
+	}
+
+	/**
+	 * @return Metadata federation file or null if none was passed to a form.
+     */
+    public File getMetadataFile() {
+        final MultiPartRequestWrapper wrapper = (MultiPartRequestWrapper) ServletActionContext.getRequest();
+		final File[] files = wrapper.getFiles("metadata");
+        return files != null && files.length > 0
+                ? files[0]
+                : null;
+    }
+
+	public File getKeystoreFile() {
+		final MultiPartRequestWrapper wrapper = (MultiPartRequestWrapper) ServletActionContext.getRequest();
+		final File[] files = wrapper.getFiles("keystore");
+		return files != null && files.length > 0
+				? files[0]
+				: null;
+	}
+
+	protected List<String> getPermissionTypes() {
+		List<String> requiredPermissions = super.getPermissionTypes();
 		requiredPermissions.add("ADMINISTRATECONFLUENCE");
 		return requiredPermissions;
 	}
 
 	@Override
 	public void validate() {
-		if (StringUtils.isBlank(getLoginUrl())) {
-			addActionError(getText("saml2Plugin.admin.loginUrlEmpty"));
-		} else {
-			try {
-				new URL(getLoginUrl());
-			} catch (MalformedURLException e) {
-				addActionError(getText("saml2Plugin.admin.loginUrlInvalid"));
-			}
+		if (StringUtils.isBlank(getSpEntityId())) {
+			addActionError(getText("saml2plugin.admin.spEntityIdIsMissing"));
 		}
-		if (StringUtils.isBlank(getLogoutUrl())) {
-			// addActionError(getText("saml2Plugin.admin.logoutUrlEmpty"));
-		} else {
-			try {
-				new URL(getLogoutUrl());
-			} catch (MalformedURLException e) {
-				addActionError(getText("saml2Plugin.admin.logoutUrlInvalid"));
-			}
+
+		if (getMetadataFile() == null) {
+			addActionError(getText("saml2plugin.admin.metadataFileIsMissing"));
 		}
-		if (StringUtils.isBlank(getEntityId())) {
-			addActionError(getText("saml2Plugin.admin.entityIdEmpty"));
-		}
-		if (StringUtils.isBlank(getX509Certificate())) {
-			addActionError(getText("saml2Plugin.admin.x509CertificateEmpty"));
-		} else {
-			try {
-				X509Utils.generateX509Certificate(getX509Certificate());
-			} catch (Exception e) {
-				addActionError(getText("saml2Plugin.admin.x509CertificateInvalid"));
-			}
-		}
+
 		if (StringUtils.isBlank(getIdpRequired())) {
 			setIdpRequired("false");
 		} else {
 			setIdpRequired("true");
 		}
+
 		if (StringUtils.isBlank(getAutoCreateUser())) {
 			setAutoCreateUser("false");
 		} else {
@@ -196,20 +193,37 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		}
 		
 		if(StringUtils.isBlank(getMaxAuthenticationAge()) || (!StringUtils.isNumeric(getMaxAuthenticationAge()))){
-			addActionError(getText("saml2Plugin.admin.maxAuthenticationAgeInvalid"));
+			addActionError(getText("saml2plugin.admin.maxAuthenticationAgeInvalid"));
+		}
+
+		if (getKeystoreFile() == null) {
+			addActionError(getText("saml2plugin.admin.keystoreFileIsMissing"));
+		}
+
+		if (StringUtils.isBlank(getKeystorePassword())) {
+			addActionError(getText("saml2plugin.admin.keystorePasswordIsMissing"));
+		}
+
+		if (StringUtils.isBlank(getSignKey())) {
+			addActionError(getText("saml2plugin.admin.signKeyIsMissing"));
+		}
+
+		if (StringUtils.isBlank(getRequestBinding())) {
+			addActionError(getText("saml2plugin.admin.requestBindingIsMissing"));
 		}
 
 		super.validate();
 	}
 
 	public String doDefault() throws Exception {
-		setLoginUrl(saml2Config.getLoginUrl());
-		setLogoutUrl(saml2Config.getLogoutUrl());
-		setEntityId(saml2Config.getIdpEntityId());
-		setX509Certificate(saml2Config.getX509Certificate());
 		setRedirectUrl(saml2Config.getRedirectUrl());
+		setSpEntityId(saml2Config.getSpEntityId());
 		long maxAuthenticationAge = saml2Config.getMaxAuthenticationAge();
-		
+
+
+		setKeystorePassword(saml2Config.getKeyStorePasswordSetting());
+		setSignKey(saml2Config.getSignKeySetting());
+		setRequestBinding(saml2Config.getRequestBindingSetting());
 		//Default Value
 		if(maxAuthenticationAge==Long.MIN_VALUE){
 			setMaxAuthenticationAge("7200");
@@ -245,18 +259,19 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	}
 
 	public String execute() throws Exception {
-		saml2Config.setLoginUrl(getLoginUrl());
-		saml2Config.setLogoutUrl(getLogoutUrl());
-		saml2Config.setEntityId(getEntityId());
-		saml2Config.setX509Certificate(getX509Certificate());
 		saml2Config.setIdpRequired(getIdpRequired());
 		saml2Config.setRedirectUrl(getRedirectUrl());
 		saml2Config.setAutoCreateUser(getAutoCreateUser());
 		saml2Config.setAutoCreateUserDefaultGroup(getDefaultAutoCreateUserGroup());
 		saml2Config.setMaxAuthenticationAge(Long.parseLong(getMaxAuthenticationAge()));
+		saml2Config.setSpEntityId(getSpEntityId());
+		saml2Config.setMetadataFile(getMetadataFile());
+		saml2Config.setKeystoreFile(getKeystoreFile());
+		saml2Config.setKeyStorePasswordSetting(getKeystorePassword());
+		saml2Config.setSignKeySetting(getSignKey());
+		saml2Config.setRequestBindingSetting(getRequestBinding());
 
 		addActionMessage(getText("saml2plugin.admin.message.saved"));
 		return "success";
 	}
-
 }

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bitium.confluence</groupId>
     <artifactId>SAML2Plugin</artifactId>
-    <version>1.0.5</version>
+    <version>1.1.1</version>
     <name>SAML 2.0 Single Sign-On for Confluence</name>
     <description>Easily configure Confluence to support SAML 2.0</description>
     <packaging>atlassian-plugin</packaging>
@@ -12,8 +12,7 @@
         <dependency>
             <groupId>com.bitium.saml</groupId>
             <artifactId>SAML2Commons</artifactId>
-            <version>1.1.1</version>
-            <scope>compile</scope>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -92,6 +91,10 @@
                 <enabled>true</enabled>
                 <checksumPolicy>warn</checksumPolicy>
             </releases>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
     <build>
