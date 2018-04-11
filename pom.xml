@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bitium.confluence</groupId>
     <artifactId>SAML2Plugin</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <name>SAML 2.0 Single Sign-On for Confluence</name>
     <description>Easily configure Confluence to support SAML 2.0</description>
     <packaging>atlassian-plugin</packaging>
@@ -118,6 +118,21 @@
             </plugin>
         </plugins>
     </build>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>atlassian-public</id>
+            <url>https://maven.atlassian.com/content/repositories/atlassian-public/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
     <properties>
         <confluence.version>5.6.1</confluence.version>
         <confluence.data.version>5.6.1</confluence.data.version>
