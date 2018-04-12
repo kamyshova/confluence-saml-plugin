@@ -22,7 +22,7 @@
 AJS.$(function() {
   if (AJS.$(".aui.login-form-container").length) {
     AJS.$(".aui.login-form-container").hide();
-    AJS.$('<div class="field-group"><a class="aui-button aui-style aui-button-primary" href="plugins/servlet/saml/auth" style="align:center;">Use Corporate Login</a></div><h2 style="margin-top:10px"></h2>').insertAfter(AJS.$(".aui.login-form-container #action-messages"));
+    AJS.$('<div class="field-group"><a class="aui-button aui-style aui-button-primary" href="plugins/servlet/globalconsumer" style="align:center;">Use Corporate Login</a></div><h2 style="margin-top:10px"></h2>').insertAfter(AJS.$(".aui.login-form-container #action-messages"));
 
     var query = location.search.substr(1);
     query.split("&").forEach(function(part) {
@@ -65,7 +65,7 @@ AJS.$(function() {
         if (response == "true") {
           // AJS.$('<img src="download/resources/com.bitium.confluence.SAML2Plugin/images/progress.png"/>').insertBefore(AJS.$(".aui.login-form-container"));
           AJS.$('<p>Please wait while we redirect you to your company log in page</p>').insertBefore(AJS.$(".aui.login-form-container"));
-          window.location.href = 'plugins/servlet/saml/auth';
+          window.location.href = 'plugins/servlet/globalconsumer';
 
         } else {
           AJS.$(".aui.login-form-container").show();

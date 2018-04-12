@@ -31,7 +31,7 @@
     <div class="field-label">$i18n.getText("saml2plugin.admin.field.samlEndpoint")</div>
     <div class="config_form_copy_container">
         <input class="field-input" id="samlEndpoint" type="text" disabled="disabled"
-               value="$urlPrefix${req.serverName}:${req.serverPort}${req.contextPath}/plugins/servlet/saml/auth">
+               value="$urlPrefix${req.serverName}:${req.serverPort}${req.contextPath}/plugins/servlet/globalconsumer">
         <input type="button" class="aui-button aui-button-primary config_form_copy" id="copy-button" value="Copy"/>
         <span id="endpoint-copied" class="config_form_copied">$i18n.getText("saml2plugin.admin.endpoint-copied")</span>
     </div>

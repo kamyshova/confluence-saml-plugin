@@ -55,7 +55,7 @@ along with Pineapple. If not, see <http://www.gnu.org/licenses/>.
   <!-- Authentication servlet. Redirects a user to IDP and then logs him in, if authentication was successfull -->
   <servlet name="SAML 2 Login Servlet" i18n-name-key="saml-login-servlet.name" key="saml-login-servlet" class="com.bitium.confluence.servlet.SsoConfluenceLoginServlet">
     <description key="saml-login-servlet.description">The SAML 2 Login Servlet Plugin</description>
-    <url-pattern>/saml/auth</url-pattern>
+    <url-pattern>/globalconsumer</url-pattern>
   </servlet>
   
   <!-- Logout servlet. Redirects a user to IDP and then logouts him  -->
