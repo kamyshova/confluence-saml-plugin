@@ -38,6 +38,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	private String defaultAutoCreateUserGroup;
 	private String idpRequired;
 	private String redirectUrl;
+	private String uidAttribute;
 	private String maxAuthenticationAge;
 	private String spEntityId;
 	private String keystorePassword;
@@ -159,6 +160,14 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		this.keystore = keystore;
 	}
 
+	public String getUidAttribute() {
+		return uidAttribute;
+	}
+
+	public void setUidAttribute(String uidAttribute) {
+		this.uidAttribute = uidAttribute;
+	}
+
 	protected List<String> getPermissionTypes() {
 		List<String> requiredPermissions = super.getPermissionTypes();
 		requiredPermissions.add("ADMINISTRATECONFLUENCE");
@@ -186,7 +195,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		} else {
 			setAutoCreateUser("true");
 		}
-		
+
 		if(StringUtils.isBlank(getMaxAuthenticationAge()) || (!StringUtils.isNumeric(getMaxAuthenticationAge()))){
 			addActionError(getText("saml2plugin.admin.maxAuthenticationAgeInvalid"));
 		}
@@ -207,6 +216,10 @@ public class ConfigureAction extends ConfluenceActionSupport {
 			addActionError(getText("saml2plugin.admin.requestBindingIsMissing"));
 		}
 
+		if (StringUtils.isBlank(getUidAttribute())) {
+			addActionError(getText("saml2Plugin.admin.uidAttributeEmpty"));
+		}
+
 		super.validate();
 	}
 
@@ -219,6 +232,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		setKeystorePassword(saml2Config.getKeyStorePasswordSetting());
 		setSignKey(saml2Config.getSignKeySetting());
 		setRequestBinding(saml2Config.getRequestBindingSetting());
+		setUidAttribute(saml2Config.getUidAttribute());
 
 		//Default Value
 		if(maxAuthenticationAge==Long.MIN_VALUE){
@@ -228,7 +242,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		else{
 			setMaxAuthenticationAge(String.valueOf(maxAuthenticationAge));
 		}
-				
+
 		String idpRequired = saml2Config.getIdpRequired();
 
 		if (idpRequired != null) {
@@ -266,6 +280,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		saml2Config.setKeyStorePasswordSetting(getKeystorePassword());
 		saml2Config.setSignKeySetting(getSignKey());
 		saml2Config.setRequestBindingSetting(getRequestBinding());
+		saml2Config.setUidAttribute(getUidAttribute());
 
 		addActionMessage(getText("saml2plugin.admin.message.saved"));
 		return "success";
