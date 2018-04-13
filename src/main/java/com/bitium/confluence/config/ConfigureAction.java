@@ -38,6 +38,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	private String defaultAutoCreateUserGroup;
 	private String idpRequired;
 	private String redirectUrl;
+	private String baseUrl;
 	private String uidAttribute;
 	private String maxAuthenticationAge;
 	private String spEntityId;
@@ -168,6 +169,14 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		this.uidAttribute = uidAttribute;
 	}
 
+	public String getBaseUrl() {
+		return baseUrl;
+	}
+
+	public void setBaseUrl(String baseUrl) {
+		this.baseUrl = baseUrl;
+	}
+
 	protected List<String> getPermissionTypes() {
 		List<String> requiredPermissions = super.getPermissionTypes();
 		requiredPermissions.add("ADMINISTRATECONFLUENCE");
@@ -220,6 +229,10 @@ public class ConfigureAction extends ConfluenceActionSupport {
 			addActionError(getText("saml2Plugin.admin.uidAttributeEmpty"));
 		}
 
+		if (StringUtils.isBlank(getBaseUrl())) {
+			addActionError(getText("saml2Plugin.admin.baseUrlEmpty"));
+		}
+
 		super.validate();
 	}
 
@@ -233,6 +246,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		setSignKey(saml2Config.getSignKeySetting());
 		setRequestBinding(saml2Config.getRequestBindingSetting());
 		setUidAttribute(saml2Config.getUidAttribute());
+		setBaseUrl(saml2Config.getBaseUrl());
 
 		//Default Value
 		if(maxAuthenticationAge==Long.MIN_VALUE){
@@ -281,6 +295,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		saml2Config.setSignKeySetting(getSignKey());
 		saml2Config.setRequestBindingSetting(getRequestBinding());
 		saml2Config.setUidAttribute(getUidAttribute());
+		saml2Config.setBaseUrl(getBaseUrl());
 
 		addActionMessage(getText("saml2plugin.admin.message.saved"));
 		return "success";
