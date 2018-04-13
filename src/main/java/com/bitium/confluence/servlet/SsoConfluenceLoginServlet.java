@@ -9,7 +9,9 @@ import com.atlassian.seraph.auth.DefaultAuthenticator;
 import com.atlassian.seraph.config.SecurityConfigFactory;
 import com.atlassian.spring.container.ContainerManager;
 import com.atlassian.user.Group;
+import com.atlassian.user.User;
 import com.atlassian.user.impl.DefaultUser;
+import com.atlassian.user.search.SearchResult;
 import com.atlassian.user.security.password.Credential;
 import com.bitium.confluence.config.SAMLConfluenceConfig;
 import com.bitium.saml.servlet.SsoLoginServlet;
@@ -21,17 +23,17 @@ import java.util.List;
 
 public class SsoConfluenceLoginServlet extends SsoLoginServlet {
 	protected void authenticateUserAndLogin(HttpServletRequest request,
-			HttpServletResponse response, String username)
+			HttpServletResponse response, String email)
 			throws Exception {
 
 		Authenticator authenticator = SecurityConfigFactory.getInstance().getAuthenticator();
 
         if (authenticator instanceof ConfluenceAuthenticator) {
-            UserAccessor userAccessor = (UserAccessor) ContainerManager.getComponent("userAccessor");
-            ConfluenceUser confluenceUser = userAccessor.getUserByName(username);
+            User confluenceUser = fetchUser(email);
 
             if (confluenceUser == null) {
-                confluenceUser = tryCreateOrUpdateUser(username);
+                log.error(String.format("Failed to find user by email: %s", email));
+                redirectToLoginWithSAMLError(response, null, "user_not_found");
             }
 
             if (confluenceUser != null) {
@@ -46,6 +48,26 @@ public class SsoConfluenceLoginServlet extends SsoLoginServlet {
 
         redirectToLoginWithSAMLError(response, null, "user_not_found");
 	}
+
+	private User fetchUser(String email) {
+        UserAccessor userAccessor = (UserAccessor) ContainerManager.getComponent("userAccessor");
+        SearchResult usersByEmail = userAccessor.getUsersByEmail(email);
+        if (usersByEmail == null) {
+            return null;
+        }
+        if (usersByEmail.pager().isEmpty()) {
+            return null;
+        }
+
+        if (usersByEmail.pager().iterator().hasNext()) {
+            Object next = usersByEmail.pager().iterator().next();
+            log.error(next.getClass());
+            if (next instanceof User) {
+                return (User)next;
+            }
+        }
+        return null;
+    }
 
     protected ConfluenceUser tryCreateOrUpdateUser(String username) {
         if (saml2Config.getAutoCreateUserFlag()){
