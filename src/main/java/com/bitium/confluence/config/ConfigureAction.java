@@ -48,6 +48,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	private String metadata;
 	private String keystore;
 	private ArrayList<String> existingGroups;
+	private List<String> existingBinding;
 
 	private SAMLConfluenceConfig saml2Config;
 
@@ -137,6 +138,19 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		this.signKey = signKey;
 	}
 
+	public List<String> getExistingBinding() {
+		List<String> bindingTypes = new ArrayList<String>();
+		bindingTypes.add(BindingUri.SAML2_POST_BINDING_URI.alias);
+		bindingTypes.add(BindingUri.SAML2_REDIRECT_BINDING_URI.alias);
+
+		setExistingBinding(bindingTypes);
+		return bindingTypes;
+	}
+
+	public void setExistingBinding(List<String> bindingTypes) {
+		this.existingBinding = bindingTypes;
+	}
+
 	public String getRequestBinding() {
 		return requestBinding;
 	}
@@ -221,10 +235,6 @@ public class ConfigureAction extends ConfluenceActionSupport {
 			addActionError(getText("saml2plugin.admin.signKeyIsMissing"));
 		}
 
-		if (StringUtils.isBlank(getRequestBinding())) {
-			addActionError(getText("saml2plugin.admin.requestBindingIsMissing"));
-		}
-
 		if (StringUtils.isBlank(getUidAttribute())) {
 			addActionError(getText("saml2Plugin.admin.uidAttributeEmpty"));
 		}
@@ -293,7 +303,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		saml2Config.setKeystoreFile(getKeystore());
 		saml2Config.setKeyStorePasswordSetting(getKeystorePassword());
 		saml2Config.setSignKeySetting(getSignKey());
-		saml2Config.setRequestBindingSetting(getRequestBinding());
+		saml2Config.setRequestBindingSetting(BindingUri.getByAlias(getRequestBinding()));
 		saml2Config.setUidAttribute(getUidAttribute());
 		saml2Config.setBaseUrl(getBaseUrl());
 
