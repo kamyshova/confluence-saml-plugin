@@ -250,7 +250,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		setRedirectUrl(saml2Config.getRedirectUrl());
 		setSpEntityId(saml2Config.getSpEntityId());
 		long maxAuthenticationAge = saml2Config.getMaxAuthenticationAge();
-		setMetadata(saml2Config.getMetadata());
+		setMetadata(saml2Config.getIdpMetadataFile());
 		setKeystore(saml2Config.getKeystore());
 		setKeystorePassword(saml2Config.getKeyStorePasswordSetting());
 		setSignKey(saml2Config.getSignKeySetting());
@@ -289,6 +289,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 			defaultAutocreateUserGroup = SAMLConfluenceConfig.DEFAULT_AUTOCREATE_USER_GROUP;
 		}
 		setDefaultAutoCreateUserGroup(defaultAutocreateUserGroup);
+		saml2Config.initializeSamlContext(true);
 		return super.doDefault();
 	}
 
@@ -299,14 +300,14 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		saml2Config.setAutoCreateUserDefaultGroup(getDefaultAutoCreateUserGroup());
 		saml2Config.setMaxAuthenticationAge(Long.parseLong(getMaxAuthenticationAge()));
 		saml2Config.setSpEntityId(getSpEntityId());
-		saml2Config.setMetadataFile(getMetadata());
+		saml2Config.setIdpMetadataFile(getMetadata());
 		saml2Config.setKeystoreFile(getKeystore());
 		saml2Config.setKeyStorePasswordSetting(getKeystorePassword());
 		saml2Config.setSignKeySetting(getSignKey());
 		saml2Config.setRequestBindingSetting(BindingUri.getByAlias(getRequestBinding()));
 		saml2Config.setUidAttribute(getUidAttribute());
 		saml2Config.setBaseUrl(getBaseUrl());
-
+        saml2Config.initializeSamlContext(false);
 		addActionMessage(getText("saml2plugin.admin.message.saved"));
 		return "success";
 	}

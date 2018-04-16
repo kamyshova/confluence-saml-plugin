@@ -49,26 +49,6 @@ public class SsoConfluenceLoginServlet extends SsoLoginServlet {
         redirectToLoginWithSAMLError(response, null, "user_not_found");
 	}
 
-	private User fetchUser(String email) {
-        UserAccessor userAccessor = (UserAccessor) ContainerManager.getComponent("userAccessor");
-        SearchResult usersByEmail = userAccessor.getUsersByEmail(email);
-        if (usersByEmail == null) {
-            return null;
-        }
-        if (usersByEmail.pager().isEmpty()) {
-            return null;
-        }
-
-        if (usersByEmail.pager().iterator().hasNext()) {
-            Object next = usersByEmail.pager().iterator().next();
-            log.error(next.getClass());
-            if (next instanceof User) {
-                return (User)next;
-            }
-        }
-        return null;
-    }
-
     protected ConfluenceUser tryCreateOrUpdateUser(String username) {
         if (saml2Config.getAutoCreateUserFlag()){
             UserAccessor userAccessor = (UserAccessor) ContainerManager.getComponent("userAccessor");
@@ -115,6 +95,26 @@ public class SsoConfluenceLoginServlet extends SsoLoginServlet {
         List<String> administratorNames = userAccessor.getMemberNamesAsList(userAccessor.getGroup("confluence-administrators"));
         if (administratorNames != null && administratorNames.size() > 0) {
             return userAccessor.getUserByName(administratorNames.get(0));
+        }
+        return null;
+    }
+
+    private User fetchUser(String email) {
+        UserAccessor userAccessor = (UserAccessor) ContainerManager.getComponent("userAccessor");
+        SearchResult usersByEmail = userAccessor.getUsersByEmail(email);
+        if (usersByEmail == null) {
+            return null;
+        }
+        if (usersByEmail.pager().isEmpty()) {
+            return null;
+        }
+
+        if (usersByEmail.pager().iterator().hasNext()) {
+            Object next = usersByEmail.pager().iterator().next();
+            log.error(next.getClass());
+            if (next instanceof User) {
+                return (User)next;
+            }
         }
         return null;
     }
