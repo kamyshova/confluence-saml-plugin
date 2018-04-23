@@ -77,6 +77,17 @@
            value="$generalUtil.htmlEncode( $uidAttribute )"/>
     <div class="field-desc">$i18n.getText("saml2plugin.admin.field.uidAttribute.desc")</div>
 
+    <div class="field-label">$i18n.getText("saml2plugin.admin.field.platformUidAttribute")</div>
+    <select class="field-select" name="platformUidAttribute" id="platformUidAttribute">
+        #foreach( $attribute in $availablePlatformUidAttributes )
+        <option value="$attribute"
+                #if ($platformUidAttribute.equals($attribute))
+                selected
+                #end>$attribute.toLowerCase()</option>
+        #end
+    </select>
+    <div class="field-desc">$i18n.getText("saml2plugin.admin.field.platformUidAttribute.desc")</div>
+
     <div class="field-label">$i18n.getText("saml2plugin.admin.field.maxAuthenticationAge")</div>
     <input class="field-input" type="text" name="maxAuthenticationAge" id="maxAuthenticationAge"
            value="$maxAuthenticationAge"/>

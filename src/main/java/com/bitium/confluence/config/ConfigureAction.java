@@ -40,6 +40,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	private String redirectUrl;
 	private String baseUrl;
 	private String uidAttribute;
+	private String platformUidAttribute;
 	private String maxAuthenticationAge;
 	private String spEntityId;
 	private String keystorePassword;
@@ -49,6 +50,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 	private String keystore;
 	private ArrayList<String> existingGroups;
 	private List<String> existingBinding;
+	private List<String> availablePlatformUidAttributes;
 
 	private SAMLConfluenceConfig saml2Config;
 
@@ -183,6 +185,22 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		this.uidAttribute = uidAttribute;
 	}
 
+	public String getPlatformUidAttribute() {
+		return platformUidAttribute;
+	}
+
+	public void setPlatformUidAttribute(final String platformUidAttribute) {
+		this.platformUidAttribute = platformUidAttribute;
+	}
+
+	public List<String> getAvailablePlatformUidAttributes() {
+		final List<String> attributesNames = new ArrayList<String>();
+		for (final UserAttribute attribute: UserAttribute.values()) {
+			attributesNames.add(attribute.name());
+		}
+		return attributesNames;
+	}
+
 	public String getBaseUrl() {
 		return baseUrl;
 	}
@@ -203,7 +221,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 			addActionError(getText("saml2plugin.admin.spEntityIdIsMissing"));
 		}
 
-		if (getMetadata() == null) {
+		if (StringUtils.isBlank(getMetadata())) {
 			addActionError(getText("saml2plugin.admin.metadataFileIsMissing"));
 		}
 
@@ -219,11 +237,12 @@ public class ConfigureAction extends ConfluenceActionSupport {
 			setAutoCreateUser("true");
 		}
 
-		if(StringUtils.isBlank(getMaxAuthenticationAge()) || (!StringUtils.isNumeric(getMaxAuthenticationAge()))){
+		if(StringUtils.isBlank(getMaxAuthenticationAge())
+				|| !StringUtils.isNumeric(getMaxAuthenticationAge())){
 			addActionError(getText("saml2plugin.admin.maxAuthenticationAgeInvalid"));
 		}
 
-		if (getKeystore() == null) {
+		if (StringUtils.isBlank(getKeystore())) {
 			addActionError(getText("saml2plugin.admin.keystoreFileIsMissing"));
 		}
 
@@ -256,6 +275,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		setSignKey(saml2Config.getSignKeySetting());
 		setRequestBinding(saml2Config.getRequestBindingSetting());
 		setUidAttribute(saml2Config.getUidAttribute());
+		setPlatformUidAttribute(saml2Config.getPlatformUidAttribute());
 		setBaseUrl(saml2Config.getBaseUrl());
 
 		//Default Value
@@ -306,6 +326,7 @@ public class ConfigureAction extends ConfluenceActionSupport {
 		saml2Config.setSignKeySetting(getSignKey());
 		saml2Config.setRequestBindingSetting(BindingUri.getByAlias(getRequestBinding()));
 		saml2Config.setUidAttribute(getUidAttribute());
+		saml2Config.setPlatformUidAttribute(getPlatformUidAttribute());
 		saml2Config.setBaseUrl(getBaseUrl());
         saml2Config.initializeSamlContext(false);
 		addActionMessage(getText("saml2plugin.admin.message.saved"));

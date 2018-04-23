@@ -11,9 +11,9 @@ import com.atlassian.spring.container.ContainerManager;
 import com.atlassian.user.Group;
 import com.atlassian.user.User;
 import com.atlassian.user.impl.DefaultUser;
-import com.atlassian.user.search.SearchResult;
 import com.atlassian.user.security.password.Credential;
 import com.bitium.confluence.config.SAMLConfluenceConfig;
+import com.bitium.confluence.config.UserAttribute;
 import com.bitium.saml.servlet.SsoLoginServlet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,17 +22,22 @@ import java.util.List;
 
 
 public class SsoConfluenceLoginServlet extends SsoLoginServlet {
-	protected void authenticateUserAndLogin(HttpServletRequest request,
-			HttpServletResponse response, String email)
-			throws Exception {
+
+    @Override
+    protected void authenticateUserAndLogin(final HttpServletRequest request,
+                                            final HttpServletResponse response,
+                                            final String userId
+    ) throws Exception {
 
 		Authenticator authenticator = SecurityConfigFactory.getInstance().getAuthenticator();
 
         if (authenticator instanceof ConfluenceAuthenticator) {
-            User confluenceUser = fetchUser(email);
+            String platformUidAttribute =
+                    ((SAMLConfluenceConfig) saml2Config).getPlatformUidAttribute();
+            User confluenceUser = fetchUser(platformUidAttribute, userId);
 
             if (confluenceUser == null) {
-                log.error(String.format("Failed to find user by email: %s", email));
+                log.error(String.format("Failed to find user by %s: %s", platformUidAttribute.toLowerCase(), userId));
                 redirectToLoginWithSAMLError(response, null, "user_not_found");
             }
 
@@ -49,6 +54,22 @@ public class SsoConfluenceLoginServlet extends SsoLoginServlet {
         redirectToLoginWithSAMLError(response, null, "user_not_found");
 	}
 
+    private User fetchUser(final String platformUidAttribute,
+                           final String userId
+    ) {
+        final UserAccessor userAccessor =
+                (UserAccessor) ContainerManager.getComponent("userAccessor");
+        final Iterable<User> users = userAccessor.getUsers();
+        final UserAttribute userAttribute = UserAttribute.valueOf(platformUidAttribute);
+        for (final User user : users) {
+            if (userAttribute.retrieveAttribute(user).equals(userId)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    @Override
     protected ConfluenceUser tryCreateOrUpdateUser(String username) {
         if (saml2Config.getAutoCreateUserFlag()){
             UserAccessor userAccessor = (UserAccessor) ContainerManager.getComponent("userAccessor");
@@ -99,23 +120,4 @@ public class SsoConfluenceLoginServlet extends SsoLoginServlet {
         return null;
     }
 
-    private User fetchUser(String email) {
-        UserAccessor userAccessor = (UserAccessor) ContainerManager.getComponent("userAccessor");
-        SearchResult usersByEmail = userAccessor.getUsersByEmail(email);
-        if (usersByEmail == null) {
-            return null;
-        }
-        if (usersByEmail.pager().isEmpty()) {
-            return null;
-        }
-
-        if (usersByEmail.pager().iterator().hasNext()) {
-            Object next = usersByEmail.pager().iterator().next();
-            log.error(next.getClass());
-            if (next instanceof User) {
-                return (User)next;
-            }
-        }
-        return null;
-    }
 }
